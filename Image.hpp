@@ -1,23 +1,44 @@
 #ifndef _IMAGE_HPP_
 #define _IMAGE_HPP_
 
-#include <opencv2/opencv.hpp> 
+#include <opencv2/opencv.hpp>
 #include <string>
+#include <stdexcept>
 
-class Image{
-    cv::Mat image;
-    std::string pathToImage;
-    std::string pathToNewImage;
+class Image {
+  cv::Mat image;
+  const std::string pathToImage;
+  const std::string pathToNewImage;
 
-    public:
-        Image():image(), pathToImage(), pathToNewImage(){}
-        Image(std::string pathToImage_, std::string pathToNewImage_):
-            pathToImage(pathToImage_), pathToNewImage(pathToNewImage_), image(){}
+public:
+  // Default constructor
+  Image() : image(), pathToImage(""), pathToNewImage("") {}
 
-        std::string getPathToImage() const;
-        std::string getPathToNewImage() const;
-        void setImage(cv::Mat image_);
-        cv::Mat geImage() const;
+  // Constructor with paths
+  Image(const std::string& pathToImage_, const std::string& pathToNewImage_)
+      : image(), pathToImage(pathToImage_), pathToNewImage(pathToNewImage_) {}
+
+  // Getters
+  std::string getPathToImage() const { return pathToImage; }
+  std::string getPathToNewImage() const { return pathToNewImage; }
+  cv::Mat getImage() const {
+    if (image.empty()) {
+      throw std::runtime_error("Image is empty!");
+    }
+    return image;
+  }
+
+  // Setters
+  void setImage(const cv::Mat& image_) {
+    if (image_.empty()) {
+      throw std::invalid_argument("Input image is empty!");
+    }
+    image = image_.clone(); // Clone to ensure ownership
+  }
+
+  // Deleting copy constructor and copy assignment
+  Image(const Image&) = delete;
+  Image& operator=(const Image&) = delete;
 };
 
 #endif
